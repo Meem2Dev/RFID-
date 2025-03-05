@@ -1,5 +1,23 @@
 .print-page {
-    padding: 20px;
-    text-align: center;
-  }
-  
+  text-align: center;
+  padding: 50px 20px;
+  background: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  max-width: 400px;
+  margin: 50px auto;
+}
+
+.print-button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  font-size: 18px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.print-button:hover {
+  background-color: #0056b3;
+}

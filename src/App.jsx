@@ -1,27 +1,29 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
-import MainPage from "./pages/Main/MainPage"; 
-import UsersPage from "./pages/Users/UsersPage";
+import LoginPage from "./pages/Login/LoginPage";
 import PrintPage from "./pages/Print/PrintPage";
 import RegisterPage from "./pages/Register/RegisterPage";
+import UsersPage from "./pages/Users/UsersPage";
+import PrintersPage from "./pages/Printers/PrintersPage";
+import FutureNotesPage from "./pages/FutureNotes/FutureNotesPage";
 import Footer from "./components/Footer";
 import "./assets/styles/app.css";
 
 function App() {
-  useEffect(() => {
-    document.title = "RFID Secured Printers";
-  }, []);
+  const [user, setUser] = useState(null);
 
   return (
     <>
       <Navbar />
       <div className="container">
         <Routes>
-          <Route path="/" element={<MainPage />} /> 
-          <Route path="/users" element={<UsersPage />} />
-          <Route path="/print" element={<PrintPage />} />
+          <Route path="/" element={<LoginPage setUser={setUser} />} />
+          <Route path="/print" element={<PrintPage user={user} />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/users" element={<UsersPage />} />
+          <Route path="/printers" element={<PrintersPage />} />
+          <Route path="/future-notes" element={<FutureNotesPage />} />
         </Routes>
       </div>
       <Footer />
