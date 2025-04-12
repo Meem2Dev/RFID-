@@ -1,40 +1,57 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "../../assets/styles/print.css";
 
-const PrintPage = ({ user }) => {
-  const [printers, setPrinters] = useState([]);
-  const [selectedPrinter, setSelectedPrinter] = useState("");
+const PrintPage = () => {
+  const [rfid, setRfid] = useState("");
+  const [user, setUser] = useState(null);
+  const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetchPrinters();
-  }, []);
+  const handleRFIDInput = async (event) => {
+    const value = event.target.value;
+    setError("");
+    setRfid(value);
 
-  const fetchPrinters = async () => {
-    try {
-      const response = await fetch("http://127.0.0.1:8000/api/printers/");
-      const data = await response.json();
-      setPrinters(data);  // API returns an array, so assign it directly
-    } catch (error) {
-      console.error("Error fetching printers:", error);
+    if (value.length > 5) {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/users/rfid-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ rfid_uid: value }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail);
+        setUser(data.user);
+        setMessage(`Hello ${data.user.name}! Ready to print.`);
+      } catch (err) {
+        setError(err.message);
+        setUser(null);
+        setMessage("");
+      }
+      setRfid(""); // Clear field after scan
     }
   };
 
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
   const handlePrint = async () => {
-    if (!user) {
-      alert("Please log in first!");
+    if (!user || !file) {
+      alert("Please scan RFID and upload a file before printing.");
       return;
     }
-    if (!selectedPrinter) {
-      alert("Select a printer first!");
-      return;
-    }
+
+    const formData = new FormData();
+    formData.append("user_id", user.id);
+    formData.append("file", file);
 
     try {
       const response = await fetch("http://127.0.0.1:8000/api/print-jobs/send", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: 1, printer_id: selectedPrinter }),
+        body: formData,
       });
 
       const data = await response.json();
@@ -47,18 +64,25 @@ const PrintPage = ({ user }) => {
   return (
     <div className="print-page">
       <h1>Print Your Document</h1>
-      {user ? <p>Logged in as: {user}</p> : <p>Please scan your RFID card first.</p>}
-      
-      <select onChange={(e) => setSelectedPrinter(e.target.value)}>
-        <option value="">Select a Printer</option>
-        {printers.map((printer) => (
-          <option key={printer.id} value={printer.id}>
-            {printer.name}
-          </option>
-        ))}
-      </select>
 
-      <button className="print-button" onClick={handlePrint}>Print</button>
+      <input
+        type="text"
+        className="rfid-input"
+        value={rfid}
+        onChange={handleRFIDInput}
+        placeholder="Scan your RFID card..."
+        autoFocus
+      />
+
+      {error && <p className="error">{error}</p>}
+      {user && <p>Logged in as: {user.name}</p>}
+
+      <input type="file" accept=".pdf,.doc,.docx,.txt" onChange={handleFileChange} />
+
+      <button className="print-button" onClick={handlePrint} disabled={!user || !file}>
+        Print
+      </button>
+
       {message && <p>{message}</p>}
     </div>
   );

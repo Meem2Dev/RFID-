@@ -20,26 +20,24 @@ const UsersPage = () => {
 
   return (
     <div className="users-page">
-      <h1>Users</h1>
+      <h1>Registered Users</h1>
       <table className="users-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Role</th>
-            <th>Authorized</th>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>RFID UID</th>
+        </tr>
+      </thead>
+      <tbody>
+        {users.map((user) => (
+          <tr key={user.id}>
+            <td>{user.id}</td>
+            <td>{user.name}</td>
+            <td>{user.rfid_uid}</td>
           </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td>{user.id}</td>
-              <td>{user.name}</td>
-              <td>{user.role}</td>
-              <td>{user.authorized ? "✅ Yes" : "❌ No"}</td>
-            </tr>
-          ))}
-        </tbody>
+        ))}
+      </tbody>
       </table>
     </div>
   );
